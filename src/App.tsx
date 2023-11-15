@@ -1,12 +1,14 @@
 
-import './App.css'
+import { Routes, Route } from "react-router-dom";
+import './css/App.css'
+import Home from "./pages/Home";
 
 function App() {
 
   return (
-    <>
-      Nerdbug frontend
-    </>
+    <Routes>
+      <Route path="/" element={<Home />} />
+    </Routes>
   )
 }
 
