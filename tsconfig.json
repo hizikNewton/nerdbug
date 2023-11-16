@@ -26,6 +26,6 @@
       "assets/*": ["assets/*"]
     }
   },
-  "include": ["src", "tailwind.config.js"],
+  "include": ["src", "tailwind.config.js", "custom.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

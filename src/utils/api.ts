@@ -24,7 +24,7 @@ const makeRequest = async <T>({
   data,
   headers = {},
 }: {
-  method: string;
+  method: 'post' | 'get';
   url: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
@@ -32,11 +32,16 @@ const makeRequest = async <T>({
   type: keyof typeof api;
 }): Promise<T> => {
   const { baseUrl, accessKey } = api[type];
-  const accessKeyString = accessKey?`?access_key=${accessKey}`:""
+  let modifiedUrl = url;
+  if (type == 'weather' && method === 'get') {
+    const queryParams = new URLSearchParams({ access_key: accessKey, ...data });
+    modifiedUrl = `${url}?${queryParams}`;
+  }
   try {
-    const response: AxiosResponse<T> = await axios({
+    const response: AxiosResponse<T> = await axios.request({
       method,
-      url: `${baseUrl}/${url}${accessKeyString}`,
+      url: `${baseUrl}/${modifiedUrl}`,
+      maxBodyLength: Infinity,
       data,
       headers,
     });
