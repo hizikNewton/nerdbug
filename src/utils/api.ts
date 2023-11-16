@@ -1,20 +1,19 @@
 import axios, { AxiosResponse } from 'axios';
 
 const {
-  REACT_APP_COUNTRY_API_URL,
-  REACT_APP_COUNTRY_API_ACCESS_KEY,
-  REACT_APP_WEATHER_API_URL,
-  REACT_APP_WEATHER_API_ACCESS_KEY,
-} = process.env;
-
+  VITE_COUNTRY_API_URL,
+  VITE_COUNTRY_API_ACCESS_KEY,
+  VITE_WEATHER_API_URL,
+  VITE_WEATHER_API_ACCESS_KEY,
+} = import.meta.env;
 const api = {
   country: {
-    baseUrl: REACT_APP_COUNTRY_API_URL,
-    accessKey: REACT_APP_COUNTRY_API_ACCESS_KEY,
+    baseUrl: VITE_COUNTRY_API_URL,
+    accessKey: VITE_COUNTRY_API_ACCESS_KEY,
   },
   weather: {
-    baseUrl: REACT_APP_WEATHER_API_URL,
-    accessKey: REACT_APP_WEATHER_API_ACCESS_KEY,
+    baseUrl: VITE_WEATHER_API_URL,
+    accessKey: VITE_WEATHER_API_ACCESS_KEY,
   },
 };
 
@@ -27,15 +26,17 @@ const makeRequest = async <T>({
 }: {
   method: string;
   url: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
   headers?: Record<string, string>;
   type: keyof typeof api;
 }): Promise<T> => {
   const { baseUrl, accessKey } = api[type];
+  const accessKeyString = accessKey?`?access_key=${accessKey}`:""
   try {
     const response: AxiosResponse<T> = await axios({
       method,
-      url: `${baseUrl}/${url}?access_key=${accessKey}`,
+      url: `${baseUrl}/${url}${accessKeyString}`,
       data,
       headers,
     });
