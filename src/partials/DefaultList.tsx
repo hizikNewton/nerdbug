@@ -8,7 +8,7 @@ import useLocalStorage from "src/utils/useLocalStorage";
 
 const DefaultList = () => {
   const [cityData, setCityData] = useState<Array<dataType>>();
-  //const { write } = useLocalStorage("default", { default: cityData })
+  const { write } = useLocalStorage("default", { default: cityData });
   const fetchCitiesByPopulation = async () => {
     try {
       const res: { data: Array<dataType> } = await makeRequest({
@@ -16,13 +16,13 @@ const DefaultList = () => {
         method: "post",
         url: "population/cities/filter",
         data: JSON.stringify({
-          "limit": 1,
-          "order": "dsc",
-          "orderBy": "value"
+          limit: 1,
+          order: "dsc",
+          orderBy: "value",
         }),
-        headers: { 'Content-Type': 'application/json' }
+        headers: { "Content-Type": "application/json" },
       });
-      return res.data
+      return res.data;
     } catch (error) {
       console.error(error);
     }
@@ -35,34 +35,52 @@ const DefaultList = () => {
         method: "get",
         url: "current",
         data: {
-          "query": city,
+          query: city,
         },
-        headers: { "Retry-After": "3600" }
       });
-      return res
+      return res;
     } catch (error) {
-      console.error(error);
+      throw new Error(error as string);
     }
   };
 
   useEffect(() => {
-    fetchCitiesByPopulation().then(data => {
-      const citiesWithWeather = data?.map(cityData => {
-        fetchWeatherForCity(cityData.city).then(weatherInfo => {
-          cityData['weatherInfo'] = weatherInfo
-        })
-        return cityData
-      })
-      citiesWithWeather?.sort((a, b) => a.city.toLowerCase().localeCompare(b.city.toLowerCase()))
+    const fetchData = async () => {
+      try {
+        const data = await fetchCitiesByPopulation();
+        const promises = data?.map(async (cityData) => {
+          try {
+            const weatherInfo = await fetchWeatherForCity(cityData.city);
+            cityData["weatherInfo"] = weatherInfo;
+          } catch (error) {
+            console.error("Error fetching weather:", error);
+            cityData["weatherInfo"] = { sample: "test" };
+          }
+          return cityData;
+        });
+        const citiesWithWeather = await Promise.all(promises!);
 
-    })
+        // Now you can sort the cities by name
+        citiesWithWeather.sort((a, b) =>
+          a.city.toLowerCase().localeCompare(b.city.toLowerCase())
+        );
+        write({ default: citiesWithWeather });
+        setCityData(citiesWithWeather);
+      } catch (error) {
+        console.error("Error fetching cities by population:", error);
+      }
+    };
 
+    fetchData();
   }, []);
-  return <Section>
-    {cityData?.map(city => {
-      return <Card data={city} />
-    })}
-  </Section>;
+
+  return (
+    <Section>
+      {cityData?.map((city) => {
+        return <Card data={city} />;
+      })}
+    </Section>
+  );
 };
 
 export default DefaultList;

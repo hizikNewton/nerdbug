@@ -4,16 +4,17 @@ import { useState } from 'react';
 type LocalStorageData<T> = {
   read: () => T | null;
   write: (value: T) => void;
+  value:T
 };
 
 // Define the useLocalStorage hook
-function useLocalStorage<T>(key: string, initialValue: T): LocalStorageData<T> {
+function useLocalStorage<T>(key: string, initialValue?: T): LocalStorageData<T> {
   // Try to retrieve data from local storage, use initialValue if not found
   const storedValue = localStorage.getItem(key);
   const initial = storedValue ? JSON.parse(storedValue) : initialValue;
 
   // State to hold the current value
-  const [, setValue] = useState<T>(initial);
+  const [value, setValue] = useState<T>(initial);
 
   // Function to read data from local storage
   const read = (): T | null => {
@@ -37,7 +38,7 @@ function useLocalStorage<T>(key: string, initialValue: T): LocalStorageData<T> {
     }
   };
 
-  return { read, write };
+  return { read, write,value };
 }
 
 export default useLocalStorage;

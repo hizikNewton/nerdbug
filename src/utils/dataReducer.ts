@@ -1,34 +1,29 @@
+
 // Define the action types
-type Action = { type: 'increment' } | { type: 'decrement' };
+type Action = { type: 'ADD_NOTE',payload:{city:string,note:string} } 
 
 // Define the reducer function
-const dataReducer = (state: number, action: Action): number => {
+const dataReducer = (state: stateType, action: Action): stateType => {
   switch (action.type) {
-    case 'increment':
-      return state + 1;
-    case 'decrement':
-      return state - 1;
+    case 'ADD_NOTE':{
+      const {city,note} = action.payload
+      if(state.length===0){
+        state.push({city:city,notes:[{id:1,date:new Date().toLocaleString(),note}]})
+      }else{
+       state.map(c=>{
+        if(c.city===city){
+          c.notes.push({id:c.notes.length+1,date:new Date().toLocaleString(),note})
+        }
+      })
+    }
+      return state
+    }
     default:
       return state;
   }
 };
 
-/* 
+
 // Define the initial state
-const initialState = 0;
-
-// Component using useReducer
-const Counter: React.FC = () => {
-  // useReducer returns the current state and a dispatch function
-  const [count, dispatch] = useReducer(counterReducer, initialState);
-
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={() => dispatch({ type: 'increment' })}>Increment</button>
-      <button onClick={() => dispatch({ type: 'decrement' })}>Decrement</button>
-    </div>
-  );
-};
-
- */export default dataReducer;
+export type stateType = Array<{city:string,notes:Array<{id:number,date:string,note:string}>}>;
+export default dataReducer;
