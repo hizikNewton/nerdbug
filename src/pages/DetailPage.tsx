@@ -1,6 +1,6 @@
 import Note from "src/components/Note";
 import Section from "src/components/Section";
-import { stateType } from "src/utils/dataReducer";
+import { stateType } from "src/utils/noteReducer";
 import useLocalStorage from "src/utils/useLocalStorage";
 
 const DetailPage = () => {

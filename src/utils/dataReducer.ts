@@ -1,20 +1,20 @@
+import dataType from "src/types/type";
 
 // Define the action types
-type Action = { type: 'ADD_NOTE',payload:{city:string,note:string} } 
+type Action = { type: 'REMOVE_ENTRY',payload:{city:string} } 
+
+
 
 // Define the reducer function
 const dataReducer = (state: stateType, action: Action): stateType => {
   switch (action.type) {
-    case 'ADD_NOTE':{
-      const {city,note} = action.payload
-      if(state.length===0){
-        state.push({city:city,notes:[{id:1,date:new Date().toLocaleString(),note}]})
-      }else{
-       state.map(c=>{
-        if(c.city===city){
-          c.notes.push({id:c.notes.length+1,date:new Date().toLocaleString(),note})
-        }
-      })
+    case 'REMOVE_ENTRY':{
+      const {city} = action.payload
+      if(state){
+      return {
+        ...state,
+        items: state.items.filter(item => item.city !== city),
+      }
     }
       return state
     }
@@ -25,5 +25,5 @@ const dataReducer = (state: stateType, action: Action): stateType => {
 
 
 // Define the initial state
-export type stateType = Array<{city:string,notes:Array<{id:number,date:string,note:string}>}>;
+export type stateType = {items:Array<dataType>} |null;
 export default dataReducer;

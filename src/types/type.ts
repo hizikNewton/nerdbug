@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface dataType {
   city: string;
   country: string;
@@ -9,7 +10,13 @@ interface dataType {
       reliabilty: string;
     }
   ];
-  weatherInfo: object;
+  weatherInfo: any;
+  favourite?:boolean
+}
+
+export interface citiesAndWeatherStateType{
+  default:Array<dataType>
+  favorites:Array<dataType>
 }
 
 export default dataType;

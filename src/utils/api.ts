@@ -1,58 +1,46 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import axios, { AxiosResponse } from 'axios';
+import dataType from "src/types/type";
+import makeRequest from "./makeRequest";
 
-const {
-  VITE_COUNTRY_API_URL,
-  VITE_COUNTRY_API_ACCESS_KEY,
-  VITE_WEATHER_API_URL,
-  VITE_WEATHER_API_ACCESS_KEY,
-} = import.meta.env;
-const api = {
-  country: {
-    baseUrl: VITE_COUNTRY_API_URL,
-    accessKey: VITE_COUNTRY_API_ACCESS_KEY,
-  },
-  weather: {
-    baseUrl: VITE_WEATHER_API_URL,
-    accessKey: VITE_WEATHER_API_ACCESS_KEY,
-  },
-};
 
-const makeRequest = async <T>({
-  type,
-  method,
-  url,
-  data,
-  headers = {},
-}: {
-  method: 'post' | 'get';
-  url: string;
-  data?: any;
-  headers?: Record<string, any>;
-  type: keyof typeof api;
-}): Promise<T> => {
-  const { baseUrl, accessKey } = api[type];
-  let modifiedUrl = url;
-  if (type == 'weather' && method === 'get') {
-    const queryParams = new URLSearchParams({ access_key: accessKey, ...data });
-    modifiedUrl = `${url}?${queryParams}`;
-  }
-  try {
-    const response: AxiosResponse<T> = await axios.request({
-      method,
-      url: `${baseUrl}/${modifiedUrl}`,
-      maxBodyLength: Infinity,
-      data,
-      headers,
-    });
+const { VITE_API_CORS_KEY } = import.meta.env;
 
-    // Handle successful response here
-    return response.data;
-  } catch (error) {
-    console.log(error);
-    // Handle error here
-    throw error;
-  }
-};
+const fetchCitiesByPopulation = async () => {
+    try {
+      const res: { data: Array<dataType> } = await makeRequest({
+        type: "country",
+        method: "post",
+        url: "population/cities/filter",
+        data: JSON.stringify({
+          limit: 4,
+          order: "dsc",
+          orderBy: "value",
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      return res.data;
+    } catch (error) {
+      console.error(error, "cannot fetch city");
+    }
+  };
 
-export default makeRequest;
+  const fetchWeatherForCity = async (city: string) => {
+    try {
+      const res = await makeRequest({
+        type: "weather",
+        method: "get",
+        url: "current",
+        data: {
+          query: city,
+        },
+        headers: {
+          "Retry-After": 3600,
+          "x-cors-api-key": VITE_API_CORS_KEY,
+        },
+      });
+      return res;
+    } catch (error) {
+      throw new Error(error as string);
+    }
+  };
+
+  export  {fetchCitiesByPopulation,fetchWeatherForCity}

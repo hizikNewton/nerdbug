@@ -1,53 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 import Card from "src/components/Card";
 import Section from "src/components/Section";
 import dataType from "src/types/type";
-import makeRequest from "src/utils/api";
+import { fetchCitiesByPopulation, fetchWeatherForCity } from "src/utils/api";
+import dataReducer from "src/utils/dataReducer";
 import useLocalStorage from "src/utils/useLocalStorage";
 
 const DefaultList = () => {
-  const { write } = useLocalStorage("default", { default: [] } as { [x: string]: Array<dataType> });
-  const [cityData, setCityData] = useState<Array<dataType>>();
-  const { VITE_API_CORS_KEY } = import.meta.env;
-  const fetchCitiesByPopulation = async () => {
-    try {
-      const res: { data: Array<dataType> } = await makeRequest({
-        type: "country",
-        method: "post",
-        url: "population/cities/filter",
-        data: JSON.stringify({
-          limit: 1,
-          order: "dsc",
-          orderBy: "value",
-        }),
-        headers: { "Content-Type": "application/json" },
-      });
-      return res.data;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const { write, read } = useLocalStorage("citiesAndWeather", { items: [] } as {
+    items: Array<dataType>;
+  });
 
-  const fetchWeatherForCity = async (city: string) => {
-    try {
-      const res: any = await makeRequest({
-        type: "weather",
-        method: "get",
-        url: "current",
-        data: {
-          query: city,
-        },
-        headers: {
-          "Retry-After": 3600,
-          'x-cors-api-key': VITE_API_CORS_KEY
-        }
-      });
-      return res;
-    } catch (error) {
-      throw new Error(error as string);
-    }
-  };
+  const [citiesAndWeather, setCityData] = useState<{
+    items: Array<dataType>;
+  } | null>(read());
+
+  const [state, dispatch] = useReducer(dataReducer, citiesAndWeather);
+
+  console.log(state);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -67,21 +38,23 @@ const DefaultList = () => {
         citiesWithWeather.sort((a, b) =>
           a.city.toLowerCase().localeCompare(b.city.toLowerCase())
         );
-        write({ default: citiesWithWeather });
-        setCityData(citiesWithWeather);
+        write({ items: citiesWithWeather });
+        setCityData({ items: citiesWithWeather });
       } catch (error) {
         console.error("Error fetching cities by population:", error);
       }
     };
-
-    fetchData();
+    if (!citiesAndWeather) {
+      fetchData();
+    }
   }, []);
   return (
     <Section>
-      {cityData?.map((city) => {
-        console.log(city)
-        return <Card data={city} />;
-      })}
+      <div className="flex">
+        {state?.items?.map((city) => {
+          return <Card data={city} dispatch={dispatch} />;
+        })}
+      </div>
     </Section>
   );
 };

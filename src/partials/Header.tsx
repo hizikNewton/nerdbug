@@ -3,7 +3,7 @@ import { FC, useEffect, useState, useReducer } from "react";
 import { Link, useLocation } from "react-router-dom";
 import reactLogo from "assets/react.svg";
 import Modal from "src/components/Modal";
-import dataReducer, { stateType } from "src/utils/dataReducer";
+import noteReducer, { stateType } from "src/utils/noteReducer";
 import Button from "src/components/Button";
 import useLocalStorage from "src/utils/useLocalStorage";
 
@@ -18,7 +18,7 @@ const Header: FC = () => {
   });
   const initialNote = read();
   const [noteState, dispatch] = useReducer(
-    dataReducer,
+    noteReducer,
     initialNote?.notes ?? []
   );
 

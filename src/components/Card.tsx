@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FC } from "react";
 import Humidity from "assets/humidity.svg?react";
 import Precip from "assets/precip.svg?react";
@@ -7,9 +8,11 @@ import Wind from "assets/wind.svg?react";
 import WindDirection from "assets/winddirection.svg?react";
 import dataType from "src/types/type";
 import { Link } from "react-router-dom";
+import IconButton from "./IconButton";
 
 interface Props {
   data: dataType;
+  dispatch: React.Dispatch<any>;
 }
 const weatherData = {
   humidity: Humidity,
@@ -19,24 +22,32 @@ const weatherData = {
   wind_dir: WindDirection,
   wind_speed: Wind,
 };
-const Card: FC<Props> = ({ data }) => {
-  const { city } = data;
-
+const Card: FC<Props> = ({ data, dispatch }) => {
+  const {
+    city,
+    weatherInfo: { current },
+  } = data || {};
+  const handleButtonClick = (e) => {
+    e.preventDefault();
+    dispatch({ type: "REMOVE_ENTRY", payload: { city } });
+  };
   return (
     <Link to="/detail" state={data}>
-      <div className="bg-day bg-auto bg-center w-80 h-96 text-white p-4">
+      <div className="p-4 text-white bg-center bg-auto bg-day w-80 h-96">
         <div className="flex justify-between">
           <div>Monday, Aug 9, 20</div>
-          <div>Settings</div>
+          <div className="">
+            <IconButton onClick={handleButtonClick} />
+          </div>
         </div>
-        <div className="city my-3">
+        <div className="my-3 city">
           <div>{city}</div>
           <div>Nevada, USA</div>
         </div>
 
         <div className="flex justify-between">
           <div>
-            <h3 className=" font-bold text-5xl">96F</h3>
+            <h3 className="text-5xl font-bold ">96F</h3>
             <span>Night partly cloud</span>
           </div>
           <div className="">
@@ -46,11 +57,13 @@ const Card: FC<Props> = ({ data }) => {
         <div className="flex flex-col">
           {Object.entries(weatherData).map(([key, Value]) => {
             return (
-              <div className="flex">
-                <div>{key}</div>
-                <div>val</div>
-                <div>
+              <div className="flex justify-between">
+                <div className="basis-1/3">{key}</div>
+                <div className="flex justify-center basis-1/3">
                   <Value />
+                </div>
+                <div className="flex justify-center basis-1/3">
+                  {current[key] ?? ""}
                 </div>
               </div>
             );
