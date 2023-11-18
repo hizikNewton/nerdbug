@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosResponse } from 'axios';
 
 const {
@@ -26,9 +27,8 @@ const makeRequest = async <T>({
 }: {
   method: 'post' | 'get';
   url: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
-  headers?: Record<string, string>;
+  headers?: Record<string, any>;
   type: keyof typeof api;
 }): Promise<T> => {
   const { baseUrl, accessKey } = api[type];

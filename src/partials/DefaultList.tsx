@@ -7,8 +7,9 @@ import makeRequest from "src/utils/api";
 import useLocalStorage from "src/utils/useLocalStorage";
 
 const DefaultList = () => {
+  const { write } = useLocalStorage("default", { default: [] } as { [x: string]: Array<dataType> });
   const [cityData, setCityData] = useState<Array<dataType>>();
-  const { write } = useLocalStorage("default", { default: cityData });
+  const { VITE_API_CORS_KEY } = import.meta.env;
   const fetchCitiesByPopulation = async () => {
     try {
       const res: { data: Array<dataType> } = await makeRequest({
@@ -37,6 +38,10 @@ const DefaultList = () => {
         data: {
           query: city,
         },
+        headers: {
+          "Retry-After": 3600,
+          'x-cors-api-key': VITE_API_CORS_KEY
+        }
       });
       return res;
     } catch (error) {
@@ -53,14 +58,12 @@ const DefaultList = () => {
             const weatherInfo = await fetchWeatherForCity(cityData.city);
             cityData["weatherInfo"] = weatherInfo;
           } catch (error) {
+            cityData["weatherInfo"] = { failed: "you are a failure" };
             console.error("Error fetching weather:", error);
-            cityData["weatherInfo"] = { sample: "test" };
           }
           return cityData;
         });
         const citiesWithWeather = await Promise.all(promises!);
-
-        // Now you can sort the cities by name
         citiesWithWeather.sort((a, b) =>
           a.city.toLowerCase().localeCompare(b.city.toLowerCase())
         );
@@ -73,10 +76,10 @@ const DefaultList = () => {
 
     fetchData();
   }, []);
-
   return (
     <Section>
       {cityData?.map((city) => {
+        console.log(city)
         return <Card data={city} />;
       })}
     </Section>
