@@ -11,12 +11,19 @@ interface dataType {
     }
   ];
   weatherInfo: any;
-  favourite?:boolean
+  favourite?: boolean;
+  notes: Array<noteType>;
 }
 
-export interface citiesAndWeatherStateType{
-  default:Array<dataType>
-  favorites:Array<dataType>
+export type noteType = {
+  id: number;
+  note: { body: string; title: string };
+  date: string;
+};
+
+export interface citiesAndWeatherStateType {
+  default: Array<dataType>;
+  favorites: Array<dataType>;
 }
 
 export default dataType;

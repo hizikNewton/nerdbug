@@ -1,18 +1,17 @@
-import { FC } from "react";
-import { FaCoffee } from "react-icons/fa";
-
-interface Props {
+import { FC, PropsWithChildren } from "react";
+interface Props extends PropsWithChildren {
   onClick: React.MouseEventHandler<HTMLButtonElement>;
   label?: string;
+  id?: number
 }
 
-const IconButton: FC<Props> = ({ onClick, label }) => {
+const IconButton: FC<Props> = ({ onClick, label, children }) => {
   return (
     <button
       className="p-1 font-bold text-white bg-blue-500 rounded  hover:bg-blue-700"
       onClick={onClick}
     >
-      <FaCoffee className="" />
+      {children}
       {label}
     </button>
   );
