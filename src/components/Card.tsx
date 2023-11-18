@@ -32,7 +32,7 @@ const Card: FC<Props> = ({ data, dispatch }) => {
     dispatch({ type: "REMOVE_ENTRY", payload: { city } });
   };
   return (
-    <Link to="/detail" state={data}>
+    <Link to={`/detail/${city}`} state={data}>
       <div className="p-4 text-white bg-center bg-auto bg-day w-80 h-96">
         <div className="flex justify-between">
           <div>Monday, Aug 9, 20</div>

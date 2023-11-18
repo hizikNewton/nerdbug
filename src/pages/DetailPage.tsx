@@ -10,7 +10,9 @@ const DetailPage = () => {
   const [{ notes }] = read()?.notes || [{}];
   return (
     <>
-      <Section>Detail</Section>
+      <Section>
+        <Card />
+      </Section>
       <Section>
         <h3>Saved Notes</h3>
 
