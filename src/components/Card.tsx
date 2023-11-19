@@ -9,15 +9,17 @@ import WindDirection from "assets/winddirection.svg?react";
 import IconButton from "./IconButton";
 import { FaCoffee } from "react-icons/fa";
 import dataType from "src/types/type";
+import { useDispatch } from "react-redux";
+import { removeEntry, setData } from "src/redux/slice";
+import { RootState } from "src/redux/store";
+import { useSelector } from "react-redux";
 
 interface Props {
   city: string;
   weatherInfo: { [x: string]: any }
-  dispatch: React.Dispatch<any>;
+  dispatch?: React.Dispatch<any>;
   details: boolean
-  citiesAndWeather: {
-    items: Array<dataType>;
-  } | null
+  citiesAndWeather?: dataType
 
 }
 const weatherData = {
@@ -28,17 +30,16 @@ const weatherData = {
   wind_dir: WindDirection,
   wind_speed: Wind,
 };
-const Card: FC<Props> = ({ city, weatherInfo, dispatch, details }) => {
+const Card: FC<Props> = ({ city, weatherInfo, details, citiesAndWeather }) => {
   const { current, } = weatherInfo
-
+  const dispatch = useDispatch()
   /*   const { write } = useLocalStorage("citiesAndWeather", { items: [] } as {
       items: Array<dataType>;
     }); */
   const handleButtonClick = (e) => {
     e.preventDefault();
-    dispatch({ type: "REMOVE_ENTRY", payload: { city } });
-
-
+    console.log("click")
+    dispatch(removeEntry(citiesAndWeather!));
   };
   /* 
     console.log(citiesAndWeather, "ctw");

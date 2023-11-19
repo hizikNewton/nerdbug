@@ -6,7 +6,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
-    port: 30122,
+    port: 3010,
   },
   plugins: [svgr(), react()],
   define: {

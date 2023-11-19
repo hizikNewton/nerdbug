@@ -5,15 +5,8 @@ type Action =
   | { type: 'REMOVE_ENTRY'; payload: { city: string } }
   | { type: 'UPDATE_ENTRY'; payload: { cityObj: dataType } };
 
-const initialState: stateType =
-  JSON.parse(localStorage.getItem('citiesAndWeather') ?? '') ||
-  ({} as stateType);
-
 // Define the reducer function
-const dataReducer = (
-  state: stateType = initialState,
-  action: Action
-): stateType => {
+const dataReducer = (state: stateType, action: Action): stateType => {
   switch (action.type) {
     case 'REMOVE_ENTRY': {
       const { city } = action.payload;

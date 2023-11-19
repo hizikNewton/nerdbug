@@ -1,17 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useReducer, useState } from "react";
+import { useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import Card from "src/components/Card";
 import Section from "src/components/Section";
+import { setData } from "src/redux/slice";
+import { RootState } from "src/redux/store";
 import dataType from "src/types/type";
 import { fetchCitiesByPopulation, fetchWeatherForCity } from "src/utils/api";
-import dataReducer from "src/utils/dataReducer";
+//import dataReducer from "src/utils/dataReducer";
 import useLocalStorage from "src/utils/useLocalStorage";
 
 const DefaultList = () => {
   const { write, read } = useLocalStorage("citiesAndWeather", { items: [] } as { items: Array<dataType> });
-  const [citiesAndWeather, setCityData] = useState<{ items: Array<dataType> } | null>(read());
-  const [state, dispatch] = useReducer(dataReducer, citiesAndWeather);
+  //const [citiesAndWeather, setCityData] = useState<{ items: Array<dataType> } | null>(read());
+  //const [state, dispatch] = useReducer(dataReducer, citiesAndWeather);
+  const dispatch = useDispatch();
+  const citiesAndWeather = useSelector((state: RootState) => state.citiesAndWeather)
+
+  console.log(citiesAndWeather, "cw")
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,25 +38,27 @@ const DefaultList = () => {
         const citiesWithWeather = await Promise.all(promises!);
         citiesWithWeather.sort((a, b) => a.city.toLowerCase().localeCompare(b.city.toLowerCase()));
         write({ items: citiesWithWeather });
-        setCityData({ items: citiesWithWeather });
+        dispatch(setData({ items: citiesWithWeather }));
       } catch (error) {
         console.error("Error fetching cities by population:", error);
-        // Provide user-friendly error message or UI feedback here
       }
     };
-
-    if (!citiesAndWeather) {
+    if (!read()) {
       fetchData();
+    } else {
+      console.log(read(), "read")
+      write(citiesAndWeather)
+      //dispatch(setData(citiesAndWeather))
     }
-    // Add dependencies if needed
-  }, [citiesAndWeather, write]);
+
+  }, [citiesAndWeather.items]);
 
   return (
     <Section>
       <div className="flex">
-        {citiesAndWeather?.items?.map((city) => (
+        {citiesAndWeather.items?.map((city) => (
           <Link to={`/detail/${city.city.toLowerCase()}`} key={city.city}>
-            <Card city={city.city} weatherInfo={city.weatherInfo} dispatch={dispatch} details={false} citiesAndWeather={state} />
+            <Card city={city.city} weatherInfo={city.weatherInfo} details={false} citiesAndWeather={city} />
           </Link>
         ))}
       </div>
