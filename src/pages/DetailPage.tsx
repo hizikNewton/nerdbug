@@ -42,6 +42,7 @@ const DetailPage = () => {
     if (!state) {
       fetchState();
     }
+    write(citiesAndWeather);
   }, [state?.city, city, citiesAndWeather.items]);
 
   const handleSave = () => {
