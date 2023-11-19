@@ -11,15 +11,16 @@ export type noteType = {
   date: string;
 };
 
-
 let savedData: initialStateType;
 
-if (localStorage.getItem("citiesAndWeather")) {
+if (localStorage.getItem('citiesAndWeather')) {
   // Data exists, retrieve and parse it
-  savedData = JSON.parse(localStorage.getItem("citiesAndWeather")!) as initialStateType;
+  savedData = JSON.parse(
+    localStorage.getItem('citiesAndWeather')!
+  ) as initialStateType;
 } else {
   // Data doesn't exist, initialize with default values or an empty state
-  savedData ={} as initialStateType
+  savedData = {} as initialStateType;
 }
 // Define the initial state using that type
 const initialState: initialStateType = savedData as initialStateType;
@@ -40,9 +41,11 @@ export const citiesAndWeatherSlice = createSlice({
       };
     },
     updateEntry: (state, action: PayloadAction<dataType>) => {
-      const updatedData = [...state.items]
-      const index = updatedData.findIndex(({city})=>city==action.payload.city)
-      updatedData[index] = action.payload
+      const updatedData = [...state.items];
+      const index = updatedData.findIndex(
+        ({ city }) => city.toLowerCase() == action.payload.city.toLowerCase()
+      );
+      updatedData[index] = action.payload;
       return {
         ...state,
         items: updatedData,
@@ -51,7 +54,8 @@ export const citiesAndWeatherSlice = createSlice({
   },
 });
 
-export const { removeEntry, setData,updateEntry } = citiesAndWeatherSlice.actions;
+export const { removeEntry, setData, updateEntry } =
+  citiesAndWeatherSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const citiesAndWeatherSelector = (state: RootState) =>

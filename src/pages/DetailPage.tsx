@@ -1,27 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { useDispatch } from "react-redux";
-import { useLocation } from "react-router";
+import { useSelector, useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 import Button from "src/components/Button";
 import Card from "src/components/Card";
 import Note from "src/components/Note";
-
 import Section from "src/components/Section";
-import { updateEntry } from "src/redux/slice";
+import { initialNoteType, noteListType, updateNote } from "src/redux/noteSlice";
 import { RootState } from "src/redux/store";
-import dataType from "src/types/type";
+import dataType, { noteType } from "src/types/type";
+import { isEmpty } from "src/utils/helper";
 import useLocalStorage from "src/utils/useLocalStorage";
+
+
 const DetailPage = () => {
-  const { city } = useLocation().state;
-  const { write, read } = useLocalStorage("citiesAndWeather", { items: [] } as {
+
+  const { city } = useParams();
+
+  const { read } = useLocalStorage("citiesAndWeather", { items: [] } as {
     items: Array<dataType>;
   });
-  const [state, setState] = useState<dataType>();
-  const citiesAndWeather = useSelector(
-    (state: RootState) => state.citiesAndWeather
-  );
+  const { write: writeNoteLs, read: readNoteLs } = useLocalStorage("notes", { noteList: [] } as initialNoteType)
+
+  const [cityState, setCityState] = useState<dataType>();
   const [note, setnote] = useState({ title: "", body: "" });
+  const [noteState, setNoteState] = useState<noteListType>({ notes: [], city })
+
+  const notes_ = useSelector((state: RootState) => state.notes);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,51 +35,51 @@ const DetailPage = () => {
   };
   const dispatch = useDispatch();
 
+
   useEffect(() => {
-    console.log(citiesAndWeather, "cw detail");
     const fetchState = () => {
-      const persistedState = read()?.items?.find((i) => i.city == city);
-      if (persistedState) {
-        setState((state) => ({ ...state, ...persistedState }));
+
+      const persistedState = read()?.items?.find((i) => i.city.toLowerCase() === city?.toLowerCase());
+      const noteState = readNoteLs()?.noteList?.find((i) => i.city.toLowerCase() === city?.toLowerCase());
+      if (noteState) {
+        setNoteState(noteState)
+      }
+
+      if (persistedState && !isEmpty(persistedState)) {
+        setCityState(cityState => ({ ...cityState, ...persistedState }));
       } else {
         console.log("make network call");
       }
     };
-    if (!state) {
+    if (!cityState) {
       fetchState();
     }
-    write(citiesAndWeather);
-  }, [state?.city, city, citiesAndWeather.items]);
+    // writeNoteLs(notes_)
+  }, [cityState?.city, city]);
+
 
   const handleSave = () => {
-    let currentCityNotes = state?.notes;
-    if (currentCityNotes) {
-      currentCityNotes.push({
-        id: currentCityNotes.length + 1,
+    let newNote = [] as noteType[]
+    const notes = notes_.noteList.find((i) => i.city.toLowerCase() === city?.toLowerCase())?.notes
+    if (!isEmpty(notes)) {
+      newNote = [...notes!]
+      newNote?.push({
+        id: newNote.length + 1,
         note: note,
         date: new Date().toLocaleString(),
       });
     } else {
-      currentCityNotes = [{ id: 1, date: new Date().toLocaleString(), note }];
+      newNote.push({ id: 1, date: new Date().toLocaleString(), note });
     }
-    const newState = { ...state!, notes: currentCityNotes };
-    dispatch(updateEntry(newState));
-    setnote({ title: "", body: "" });
-    /* 
-    write(cityState as any);  */
+
+    dispatch(updateNote({ city, notes: newNote }))
+    writeNoteLs(notes_)
   };
   /*  
- 
-   
  
    const [cityState, dispatch] = useReducer(dataReducer, read());
  
    const currentCity = cityState!.items.find(i => i.city === state.city)
- 
- 
- 
- 
- 
  
    const edit = (id) => {
      const note = currentCity?.notes?.filter(i => i.id === id)
@@ -84,7 +90,7 @@ const DetailPage = () => {
   return (
     <>
       <Section>
-        <Card details={true} city={city} cityWeather={state} />
+        <Card details={true} city={city} cityWeather={cityState} />
 
         <input
           onChange={handleChange}
@@ -104,8 +110,8 @@ const DetailPage = () => {
       <Section>
         <h3>Saved Notes</h3>
         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {state?.notes?.map(({ date, note }) => (
-            <Note date={date} note={note} edit={edit} />
+          {noteState?.notes.map(({ date, note }) => (
+            <Note date={date} note={note} edit={() => { }} />
           ))}
         </div>
       </Section>
