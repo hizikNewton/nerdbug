@@ -4,22 +4,6 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import type { RootState } from './store';
 import dataType from 'src/types/type';
 
-// Define a type for the slice state
-/* interface citiesAndWeatherState {
-  city: string;
-  country: string;
-  populationCounts: [
-    {
-      year: string;
-      value: string;
-      sex: string;
-      reliabilty: string;
-    }
-  ];
-  weatherInfo: any;
-  favourite?: boolean;
-  notes: Array<noteType>;
-} */
 type initialStateType = { items: Array<dataType> };
 export type noteType = {
   id: number;
@@ -27,8 +11,18 @@ export type noteType = {
   date: string;
 };
 
+
+let savedData: initialStateType;
+
+if (localStorage.getItem("citiesAndWeather")) {
+  // Data exists, retrieve and parse it
+  savedData = JSON.parse(localStorage.getItem("citiesAndWeather")!) as initialStateType;
+} else {
+  // Data doesn't exist, initialize with default values or an empty state
+  savedData ={} as initialStateType
+}
 // Define the initial state using that type
-const initialState: initialStateType = {} as initialStateType;
+const initialState: initialStateType = savedData as initialStateType;
 
 export const citiesAndWeatherSlice = createSlice({
   name: 'citiesAndWeather',
@@ -45,10 +39,19 @@ export const citiesAndWeatherSlice = createSlice({
         items: state!.items.filter((item) => item.city !== action.payload.city),
       };
     },
+    updateEntry: (state, action: PayloadAction<dataType>) => {
+      const updatedData = [...state.items]
+      const index = updatedData.findIndex(({city})=>city==action.payload.city)
+      updatedData[index] = action.payload
+      return {
+        ...state,
+        items: updatedData,
+      };
+    },
   },
 });
 
-export const { removeEntry, setData } = citiesAndWeatherSlice.actions;
+export const { removeEntry, setData,updateEntry } = citiesAndWeatherSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const citiesAndWeatherSelector = (state: RootState) =>

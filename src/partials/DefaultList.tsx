@@ -13,13 +13,15 @@ import { fetchCitiesByPopulation, fetchWeatherForCity } from "src/utils/api";
 import useLocalStorage from "src/utils/useLocalStorage";
 
 const DefaultList = () => {
-  const { write, read } = useLocalStorage("citiesAndWeather", { items: [] } as { items: Array<dataType> });
-  //const [citiesAndWeather, setCityData] = useState<{ items: Array<dataType> } | null>(read());
-  //const [state, dispatch] = useReducer(dataReducer, citiesAndWeather);
+  const { write, read } = useLocalStorage("citiesAndWeather", { items: [] } as {
+    items: Array<dataType>;
+  });
   const dispatch = useDispatch();
-  const citiesAndWeather = useSelector((state: RootState) => state.citiesAndWeather)
+  const citiesAndWeather = useSelector(
+    (state: RootState) => state.citiesAndWeather
+  );
 
-  console.log(citiesAndWeather, "cw")
+  console.log(citiesAndWeather, "cw");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,7 +38,9 @@ const DefaultList = () => {
           return cityData;
         });
         const citiesWithWeather = await Promise.all(promises!);
-        citiesWithWeather.sort((a, b) => a.city.toLowerCase().localeCompare(b.city.toLowerCase()));
+        citiesWithWeather.sort((a, b) =>
+          a.city.toLowerCase().localeCompare(b.city.toLowerCase())
+        );
         write({ items: citiesWithWeather });
         dispatch(setData({ items: citiesWithWeather }));
       } catch (error) {
@@ -46,31 +50,27 @@ const DefaultList = () => {
     if (!read()) {
       fetchData();
     } else {
-      console.log(read(), "read")
-      write(citiesAndWeather)
+      console.log(read(), "read");
+      write(citiesAndWeather);
       //dispatch(setData(citiesAndWeather))
     }
-
   }, [citiesAndWeather.items]);
 
   return (
     <Section>
       <div className="flex">
-        {citiesAndWeather.items?.map((city) => (
-          <Link to={`/detail/${city.city.toLowerCase()}`} key={city.city}>
-            <Card city={city.city} weatherInfo={city.weatherInfo} details={false} citiesAndWeather={city} />
+        {citiesAndWeather.items?.map((item) => (
+          <Link
+            to={`/detail/${item.city.toLowerCase()}`}
+            key={item.city}
+            state={{ city: item.city }}
+          >
+            <Card city={item.city} details={false} cityWeather={item} />
           </Link>
         ))}
       </div>
     </Section>
   );
 };
-
-
-
-
-
-
-
 
 export default DefaultList;
