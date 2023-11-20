@@ -2,12 +2,8 @@ import { FaEdit, FaTrash } from "react-icons/fa";
 import IconButton from "./IconButton";
 import { useDispatch } from "react-redux";
 import { removeNote } from "src/redux/noteSlice";
-import { useSelector } from "react-redux";
-import { RootState } from "src/redux/store";
-
 const Note = ({ note, date, edit, city }) => {
   const id = note.id;
-  const notes_ = useSelector((state: RootState) => state.notes);
   const dispatch = useDispatch();
   const handleButtonEdit = (e) => {
     edit(e.target.id);

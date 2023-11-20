@@ -77,7 +77,7 @@ const DetailPage = () => {
       newNote.push({ id: 1, date: new Date().toLocaleString(), note });
     }
 
-    dispatch(updateNote({ city, notes: newNote }));
+    dispatch(updateNote({ city: city!, notes: newNote }));
   };
 
   return (
