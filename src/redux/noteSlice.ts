@@ -35,25 +35,48 @@ export const noteSlice = createSlice({
       return { ...state, ...action.payload };
     },
     updateNote: (state, action: PayloadAction<noteListType>) => {
-      let updatedData = [...state.noteList];
-
+      const { city, notes } = action.payload;
+    
       const index = state.noteList.findIndex(
-        ({ city }) => city.toLowerCase() == action.payload.city.toLowerCase()
+        ({ city: storedCity }) => storedCity.toLowerCase() === city.toLowerCase()
       );
-      console.log(action.payload.notes, 'dj', index);
-      if (index != -1) {
-        updatedData[index].notes.push(...action.payload.notes);
-      } else {
-        updatedData = [action.payload];
-      }
-      return {
-        ...state.noteList,
-        updatedData,
-      };
+    
+      const updatedNoteList = index !== -1
+        ? state.noteList.map((item, i) =>
+            i === index
+              ? { ...item, notes: [...item.notes, ...notes] }
+              : item
+          )
+        : [...state.noteList, { city, notes }];
+    
+      return { ...state, noteList: updatedNoteList };
     },
-  },
+    removeNote: (state, action: PayloadAction<{city:string,noteId:number}>) => {
+      const { city, noteId } = action.payload;
+    
+      const index = state.noteList.findIndex(
+        ({ city: storedCity }) => storedCity.toLowerCase() === city.toLowerCase()
+      );
+    
+      if (index !== -1) {
+        const updatedNoteList = state.noteList.map((item, i) =>
+          i === index
+            ? {
+                ...item,
+                notes: item.notes.filter((note) => note.id !== noteId),
+              }
+            : item
+        );
+    
+        return { ...state, noteList: updatedNoteList };
+      }
+    
+      // If the city doesn't exist, return the state unchanged
+      return state;
+    },
+  }
 });
 
-export const { setData, updateNote } = noteSlice.actions;
+export const { setData, updateNote,removeNote } = noteSlice.actions;
 
 export default noteSlice.reducer;

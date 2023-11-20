@@ -7,7 +7,7 @@ import Visibilty from "assets/visibilty.svg?react";
 import Wind from "assets/wind.svg?react";
 import WindDirection from "assets/winddirection.svg?react";
 import IconButton from "./IconButton";
-import { FaCoffee } from "react-icons/fa";
+import { FaHeart, FaTrash } from "react-icons/fa";
 import dataType from "src/types/type";
 import { useDispatch } from "react-redux";
 import { removeEntry } from "src/redux/slice";
@@ -27,7 +27,8 @@ const weatherData = {
   wind_speed: Wind,
 };
 const Card: FC<Props> = ({ city, details, cityWeather }) => {
-  const { current } = cityWeather?.weatherInfo || {};
+  const { current, location } = cityWeather?.weatherInfo || {};
+  console.log(current, "state");
   const dispatch = useDispatch();
   /*   const { write } = useLocalStorage("citiesAndWeather", { items: [] } as {
       items: Array<dataType>;
@@ -47,18 +48,21 @@ const Card: FC<Props> = ({ city, details, cityWeather }) => {
     <div className="p-4 text-white bg-center bg-auto bg-day w-80">
       <div className="flex justify-between">
         <div>Monday, Aug 9, 20</div>
-        {!details && (
-          <div className="">
+
+        <div className="flex gap-2">
+          {!details && (
             <IconButton onClick={handleButtonClick}>
-              {" "}
-              <FaCoffee className="" />
+              <FaHeart className="" />
             </IconButton>
-          </div>
-        )}
+          )}
+          <IconButton onClick={handleButtonClick}>
+            <FaTrash className="" />
+          </IconButton>
+        </div>
       </div>
       <div className="my-3 city">
         <div>{city}</div>
-        <div>Nevada, USA</div>
+        <div>{location.country}</div>
       </div>
 
       <div className="flex justify-between">
@@ -67,7 +71,7 @@ const Card: FC<Props> = ({ city, details, cityWeather }) => {
           <span>Night partly cloud</span>
         </div>
         <div className="">
-          <img src="https://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png" />
+          <img src={current.weatherIcon} />
         </div>
       </div>
       {details && current && (

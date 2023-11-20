@@ -21,8 +21,6 @@ const DefaultList = () => {
     (state: RootState) => state.citiesAndWeather
   );
 
-  console.log(citiesAndWeather, "cw");
-
   useEffect(() => {
     const fetchData = async () => {
       try {
