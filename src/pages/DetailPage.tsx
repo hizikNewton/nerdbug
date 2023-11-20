@@ -26,7 +26,7 @@ const DetailPage = () => {
 
   const [cityState, setCityState] = useState<dataType>();
   const [note, setnote] = useState({ title: "", body: "" });
-  const [noteState, setNoteState] = useState<noteListType>({ notes: [], city });
+  const [_, setNoteState] = useState<noteListType>({ notes: [], city: city ?? "" });
 
   const notes_ = useSelector((state: RootState) => state.notes);
 
@@ -79,22 +79,11 @@ const DetailPage = () => {
 
     dispatch(updateNote({ city, notes: newNote }));
   };
-  /*  
- 
-   const [cityState, dispatch] = useReducer(dataReducer, read());
- 
-   const currentCity = cityState!.items.find(i => i.city === state.city)
- 
-   const edit = (id) => {
-     const note = currentCity?.notes?.filter(i => i.id === id)
-     console.log(cityState, id, "howw")
-     setnote(currentNote => ({ ...currentNote, note }))
-   }
-  */
+
   return (
     <>
-      <Section>
-        <Card details={true} city={city} cityWeather={cityState} />
+      <Section className="items-center relative -top-28">
+        <Card details={true} city={city!} cityWeather={cityState} />
         <div className=" w-80 my-4">
           <div>
             <label
@@ -140,7 +129,7 @@ const DetailPage = () => {
         <h3 className=" text-2xl font-bold mb-2 text-left">Saved Notes</h3>
         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {notes?.map(({ date, note }) => (
-            <Note date={date} note={note} edit={() => {}} city={city} />
+            <Note date={date} note={note} edit={() => { }} city={city} />
           ))}
         </div>
       </Section>

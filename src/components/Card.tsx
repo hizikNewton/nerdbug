@@ -10,7 +10,7 @@ import IconButton from "./IconButton";
 import { FaHeart, FaTrash } from "react-icons/fa";
 import dataType from "src/types/type";
 import { useDispatch } from "react-redux";
-import { removeEntry } from "src/redux/slice";
+import { removeEntry, addFavourite } from "src/redux/slice";
 
 interface Props {
   city: string;
@@ -28,50 +28,49 @@ const weatherData = {
 };
 const Card: FC<Props> = ({ city, details, cityWeather }) => {
   const { current, location } = cityWeather?.weatherInfo || {};
-  console.log(current, "state");
+  console.log(location, "state");
   const dispatch = useDispatch();
   /*   const { write } = useLocalStorage("citiesAndWeather", { items: [] } as {
       items: Array<dataType>;
     }); */
-  const handleButtonClick = (e) => {
+  const handleRemoveClick = (e) => {
     e.preventDefault();
-    console.log("click");
     dispatch(removeEntry(cityWeather!));
   };
-  /* 
-    console.log(citiesAndWeather, "ctw");
-    useEffect(() => {
-      write(citiesAndWeather!)
-    }, [citiesAndWeather?.items.length]) */
+
+  const handleLikeClick = (e) => {
+    e.preventDefault();
+    dispatch(addFavourite({ city }));
+  };
 
   return (
-    <div className="p-4 text-white bg-center bg-auto bg-day w-80">
+    <div className={`p-4 text-white bg-center bg-auto ${current?.is_day === "yes" ? "bg-day" : "bg-night"} w-80`}>
       <div className="flex justify-between">
-        <div>Monday, Aug 9, 20</div>
+        <div>{new Date(location?.localtime).toDateString()}</div>
 
         <div className="flex gap-2">
           {!details && (
-            <IconButton onClick={handleButtonClick}>
+            <IconButton onClick={handleLikeClick}>
               <FaHeart className="" />
             </IconButton>
           )}
-          <IconButton onClick={handleButtonClick}>
+          <IconButton onClick={handleRemoveClick}>
             <FaTrash className="" />
           </IconButton>
         </div>
       </div>
       <div className="my-3 city">
         <div>{city}</div>
-        <div>{location.country}</div>
+        <div>{location?.country}</div>
       </div>
 
       <div className="flex justify-between">
         <div>
-          <h3 className="text-5xl font-bold ">96F</h3>
-          <span>Night partly cloud</span>
+          <h3 className="text-5xl font-bold ">{current?.temperature}&deg;C</h3>
+          <span>{current?.weather_descriptions[0]}</span>
         </div>
         <div className="">
-          <img src={current.weatherIcon} />
+          <img src={current?.weather_icons} />
         </div>
       </div>
       {details && current && (

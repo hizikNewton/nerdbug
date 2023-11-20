@@ -9,7 +9,7 @@ import { setData } from "src/redux/slice";
 import { RootState } from "src/redux/store";
 import dataType from "src/types/type";
 import { fetchCitiesByPopulation, fetchWeatherForCity } from "src/utils/api";
-//import dataReducer from "src/utils/dataReducer";
+import { isEmpty } from "src/utils/helper";
 import useLocalStorage from "src/utils/useLocalStorage";
 
 const DefaultList = () => {
@@ -20,6 +20,11 @@ const DefaultList = () => {
   const citiesAndWeather = useSelector(
     (state: RootState) => state.citiesAndWeather
   );
+
+  const favouriteList = citiesAndWeather.items?.filter(
+    (item) => item.favourite === true
+  );
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,19 +60,36 @@ const DefaultList = () => {
   }, [citiesAndWeather.items]);
 
   return (
-    <Section>
-      <div className="flex">
-        {citiesAndWeather.items?.map((item) => (
-          <Link
-            to={`/detail/${item.city.toLowerCase()}`}
-            key={item.city}
-            state={{ city: item.city }}
-          >
-            <Card city={item.city} details={false} cityWeather={item} />
-          </Link>
-        ))}
-      </div>
-    </Section>
+    <>
+      {!isEmpty(favouriteList) && <Section className='items-start'>
+
+        <h3 className=" text-2xl font-bold mb-2 text-left">Favourites</h3>
+        <div className="flex">
+          {favouriteList.map((item) => (
+            <Link
+              to={`/detail/${item.city.toLowerCase()}`}
+              key={item.city}
+              state={{ city: item.city }}
+            >
+              <Card city={item.city} details={false} cityWeather={item} />
+            </Link>
+          ))}
+        </div>
+      </Section>}
+      <Section>
+        <div className="flex gap-6">
+          {citiesAndWeather.items?.map((item) => (
+            <Link
+              to={`/detail/${item.city.toLowerCase()}`}
+              key={item.city}
+              state={{ city: item.city }}
+            >
+              <Card city={item.city} details={false} cityWeather={item} />
+            </Link>
+          ))}
+        </div>
+      </Section>
+    </>
   );
 };
 

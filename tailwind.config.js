@@ -5,6 +5,8 @@ export default {
     extend: {
       backgroundImage: {
         day: 'url(assets/day.jpg)',
+        night: 'url(assets/night.jpg)',
+        hero: 'url(assets/hero.svg)',
       },
     },
   },

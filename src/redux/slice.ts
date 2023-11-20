@@ -33,7 +33,18 @@ export const citiesAndWeatherSlice = createSlice({
     setData: (state, action: PayloadAction<initialStateType>) => {
       return { ...state, ...action.payload };
     },
-    // Use the PayloadAction type to declare the contents of `action.payload`
+
+    addFavourite: (state, action: PayloadAction<{ city: string }>) => {
+      const index = state!.items.findIndex(
+        (item) => item.city == action.payload.city
+      );
+      const filtered = state!.items.filter(
+        (item) => item.city !== action.payload.city
+      );
+      const current = state.items[index];
+      const updatedCurrent = { ...current, favourite: !current?.favourite };
+      return { ...state, items: [...filtered, updatedCurrent] };
+    },
     removeEntry: (state, action: PayloadAction<dataType>) => {
       return {
         ...state,
@@ -54,7 +65,7 @@ export const citiesAndWeatherSlice = createSlice({
   },
 });
 
-export const { removeEntry, setData, updateEntry } =
+export const { removeEntry, setData, updateEntry, addFavourite } =
   citiesAndWeatherSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

@@ -12,7 +12,7 @@ const Section = ({
   return (
     <section className="">
       <div
-        className={`flex flex-col items-center max-w-6xl  pt-6 px-4 mx-auto mb-20 sm:px-6 ${classes}`}
+        className={`${classes} flex flex-col  max-w-6xl  pt-6 px-4 mx-auto mb-10 sm:px-6 `}
       >
 
         {children}
