@@ -6,10 +6,10 @@ import Button from "src/components/Button";
 import Card from "src/components/Card";
 import Note from "src/components/Note";
 import Section from "src/components/Section";
-import { initialNoteType, noteListType, updateNote } from "src/redux/noteSlice";
+import { initialNoteType, noteListType, noteType, saveNote, updateNote } from "src/redux/noteSlice";
 import { RootState } from "src/redux/store";
-import dataType, { noteType } from "src/types/type";
-import { isEmpty } from "src/utils/helper";
+import dataType from "src/types/type";
+import { generateRandomId, isEmpty } from "src/utils/helper";
 import useLocalStorage from "src/utils/useLocalStorage";
 
 const DetailPage = () => {
@@ -22,18 +22,24 @@ const DetailPage = () => {
     noteList: [],
   } as initialNoteType);
 
+
+  const notes_ = useSelector((state: RootState) => state.notes);
+
+  const cityAndNotesArray = notes_.noteList.find(
+    (i) => i.city.toLowerCase() === city?.toLowerCase()
+  );
+
   const { state } = useLocation();
 
   const [cityState, setCityState] = useState<dataType>();
-  const [note, setnote] = useState({ title: "", body: "" });
+  const initialNoteState = { id: "", date: "", body: "", title: "" }
+  const [note, setnote] = useState<noteType>(initialNoteState);
   const [showNote, setShowNote] = useState(false);
   const [_, setNoteState] = useState<noteListType>({
     notes: [],
     city: city ?? "",
   });
   const noteRef = useRef<HTMLDivElement>(null);
-
-  const notes_ = useSelector((state: RootState) => state.notes);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -65,25 +71,17 @@ const DetailPage = () => {
     writeNoteLs(notes_);
     if (showNote) noteRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [cityState?.city, city, notes_, showNote]);
-  const notes = notes_.noteList.find(
-    (i) => i.city.toLowerCase() === city?.toLowerCase()
-  )?.notes;
+
+
   const handleSave = () => {
-    let newNote = [] as noteType[];
-
-    if (!isEmpty(notes)) {
-      newNote = [...notes!];
-      newNote?.push({
-        id: newNote.length + 1,
-        note: note,
-        date: new Date().toLocaleString(),
-      });
+    const note_ = { ...note, date: new Date().toLocaleString() }
+    //const index = cityAndNotesArray?.notes.findIndex(i => i.id === note_.id)
+    if (isEmpty(note.id)) {
+      dispatch(saveNote({ city: city!, note: { ...note_, id: generateRandomId() } }));
     } else {
-      newNote.push({ id: 1, date: new Date().toLocaleString(), note });
+      dispatch(updateNote({ city: city!, noteId: note.id, updatedNote: note_ }))
     }
-
-    dispatch(updateNote({ city: city!, notes: newNote }));
-    setnote({ body: "", title: "" });
+    setnote(initialNoteState);
   };
 
   const handleShowNote = (e) => {
@@ -100,6 +98,7 @@ const DetailPage = () => {
             cityWeather={cityState}
             handleShowNote={handleShowNote}
             noteRef={noteRef}
+            classx="shadow-3xl"
           />
           {showNote && (
             <div className="my-4 w-80" ref={noteRef}>
@@ -148,8 +147,8 @@ const DetailPage = () => {
       <Section className="">
         <h3 className="mb-2 text-2xl font-bold text-left ">Saved Notes</h3>
         <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {notes?.map(({ date, note }) => (
-            <Note date={date} note={note} edit={() => {}} city={city} />
+          {cityAndNotesArray?.notes?.map(note => (
+            <Note noteItem={note} city={city!} setnote={setnote} setShowNote={setShowNote} />
           ))}
         </div>
       </Section>

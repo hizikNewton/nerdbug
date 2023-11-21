@@ -64,7 +64,9 @@ const DefaultList = () => {
         <Section className="items-start">
           <h3 className="mb-2 text-2xl font-bold text-left ">Favourites</h3>
           <div className="flex flex-wrap gap-6 justify-evenly">
-            {favouriteList.map((item) => (
+            {favouriteList.sort((a, b) =>
+              a.city.toLowerCase().localeCompare(b.city.toLowerCase())
+            ).map((item) => (
               <Link
                 to={`/detail/${item.city.toLowerCase()}`}
                 key={item.city}

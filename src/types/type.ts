@@ -12,14 +12,7 @@ interface dataType {
   ];
   weatherInfo: any;
   favourite?: boolean;
-  notes: Array<noteType>;
 }
-
-export type noteType = {
-  id: number;
-  note: { body: string; title: string };
-  date: string;
-};
 
 export interface citiesAndWeatherStateType {
   default: Array<dataType>;

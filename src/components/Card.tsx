@@ -21,6 +21,7 @@ interface Props {
   cityWeather?: dataType;
   handleShowNote?: (e) => void;
   noteRef?: RefObject<HTMLDivElement>;
+  classx?: string
 }
 const weatherData = {
   humidity: Humidity,
@@ -30,9 +31,8 @@ const weatherData = {
   wind_dir: Winddirection,
   wind_speed: Wind,
 };
-const Card: FC<Props> = ({ city, details, cityWeather, handleShowNote }) => {
+const Card: FC<Props> = ({ city, details, cityWeather, handleShowNote, classx }) => {
   const { current, location } = cityWeather?.weatherInfo || {};
-  console.log(location, "state");
   const dispatch = useDispatch();
 
   const handleRemoveClick = (e) => {
@@ -47,9 +47,8 @@ const Card: FC<Props> = ({ city, details, cityWeather, handleShowNote }) => {
 
   return (
     <div
-      className={`p-4 text-white bg-center bg-auto rounded  ${
-        current?.is_day === "yes" ? "bg-day" : "bg-night"
-      } w-80`}
+      className={` ${classx ?? ""} p-4 text-white bg-center bg-auto rounded shadow-2xl  ${current?.is_day === "yes" ? "bg-day" : "bg-night"
+        } w-80`}
     >
       <div className="flex justify-between">
         <div>{new Date(location?.localtime).toDateString()}</div>

@@ -30,3 +30,42 @@ export const isEmpty = (value: any): boolean => {
 
   return false;
 };
+
+export const generateRandomId = (): string => {
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomId = '';
+
+  for (let i = 0; i < 8; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomId += characters.charAt(randomIndex);
+  }
+
+  return randomId;
+};
+
+interface CustomPosition {
+  coords: {
+    latitude: number;
+    longitude: number;
+    // you can include other properties like altitude, accuracy, etc. if needed
+  };
+  timestamp: number;
+}
+
+export const getUserLocation = (): Promise<CustomPosition> => {
+  return new Promise((resolve, reject) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          resolve(position);
+        },
+        (error) => {
+          reject(error);
+        }
+      );
+    } else {
+      reject(new Error('Geolocation is not supported by this browser.'));
+    }
+  });
+};
