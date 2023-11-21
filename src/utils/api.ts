@@ -11,7 +11,7 @@ const fetchCitiesByPopulation = async () => {
         method: "post",
         url: "population/cities/filter",
         data: JSON.stringify({
-          limit: 4,
+          limit: 15,
           order: "dsc",
           orderBy: "value",
         }),
