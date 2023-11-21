@@ -1,38 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FC } from "react";
-import Humidity from "assets/humidity.svg?react";
-import Precip from "assets/precip.svg?react";
-import Temp from "assets/temperature.svg?react";
-import Visibilty from "assets/visibilty.svg?react";
-import Wind from "assets/wind.svg?react";
-import WindDirection from "assets/winddirection.svg?react";
+import { FC, RefObject } from "react";
 import IconButton from "./IconButton";
-import { FaHeart, FaTrash } from "react-icons/fa";
+import { FaHeart, FaNotesMedical, FaTrash } from "react-icons/fa";
 import dataType from "src/types/type";
 import { useDispatch } from "react-redux";
 import { removeEntry, addFavourite } from "src/redux/slice";
+import {
+  Humidity,
+  Precip,
+  Temperature,
+  Visibilty,
+  Wind,
+  Winddirection,
+} from "src/assets/icons";
 
 interface Props {
   city: string;
   dispatch?: React.Dispatch<any>;
   details: boolean;
   cityWeather?: dataType;
+  handleShowNote?: (e) => void;
+  noteRef?: RefObject<HTMLDivElement>;
 }
 const weatherData = {
   humidity: Humidity,
   precip: Precip,
-  temperature: Temp,
+  temperature: Temperature,
   visibility: Visibilty,
-  wind_dir: WindDirection,
+  wind_dir: Winddirection,
   wind_speed: Wind,
 };
-const Card: FC<Props> = ({ city, details, cityWeather }) => {
+const Card: FC<Props> = ({ city, details, cityWeather, handleShowNote }) => {
   const { current, location } = cityWeather?.weatherInfo || {};
   console.log(location, "state");
   const dispatch = useDispatch();
-  /*   const { write } = useLocalStorage("citiesAndWeather", { items: [] } as {
-      items: Array<dataType>;
-    }); */
+
   const handleRemoveClick = (e) => {
     e.preventDefault();
     dispatch(removeEntry(cityWeather!));
@@ -44,19 +46,30 @@ const Card: FC<Props> = ({ city, details, cityWeather }) => {
   };
 
   return (
-    <div className={`p-4 text-white bg-center bg-auto ${current?.is_day === "yes" ? "bg-day" : "bg-night"} w-80`}>
+    <div
+      className={`p-4 text-white bg-center bg-auto rounded  ${
+        current?.is_day === "yes" ? "bg-day" : "bg-night"
+      } w-80`}
+    >
       <div className="flex justify-between">
         <div>{new Date(location?.localtime).toDateString()}</div>
 
         <div className="flex gap-2">
-          {!details && (
-            <IconButton onClick={handleLikeClick}>
-              <FaHeart className="" />
+          {details ? (
+            <IconButton onClick={handleShowNote!}>
+              <FaNotesMedical />
             </IconButton>
+          ) : (
+            <>
+              <IconButton onClick={handleLikeClick}>
+                <FaHeart />
+              </IconButton>
+
+              <IconButton onClick={handleRemoveClick}>
+                <FaTrash />
+              </IconButton>
+            </>
           )}
-          <IconButton onClick={handleRemoveClick}>
-            <FaTrash className="" />
-          </IconButton>
         </div>
       </div>
       <div className="my-3 city">
@@ -78,9 +91,11 @@ const Card: FC<Props> = ({ city, details, cityWeather }) => {
           {Object.entries(weatherData).map(([key, Value]) => {
             return (
               <div className="flex justify-between">
-                <div className="basis-1/3">{key}</div>
+                <div className="basis-1/3">
+                  {key[0].toUpperCase() + key.slice(1)}
+                </div>
                 <div className="flex justify-center basis-1/3">
-                  <Value />
+                  <Value className="w-6 h-6" fill="white" />
                 </div>
                 <div className="flex justify-center basis-1/3">
                   {current[key] ?? ""}

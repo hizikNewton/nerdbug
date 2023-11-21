@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useLocation, useParams } from "react-router-dom";
 import Button from "src/components/Button";
@@ -26,7 +26,12 @@ const DetailPage = () => {
 
   const [cityState, setCityState] = useState<dataType>();
   const [note, setnote] = useState({ title: "", body: "" });
-  const [_, setNoteState] = useState<noteListType>({ notes: [], city: city ?? "" });
+  const [showNote, setShowNote] = useState(false);
+  const [_, setNoteState] = useState<noteListType>({
+    notes: [],
+    city: city ?? "",
+  });
+  const noteRef = useRef<HTMLDivElement>(null);
 
   const notes_ = useSelector((state: RootState) => state.notes);
 
@@ -51,7 +56,6 @@ const DetailPage = () => {
       if (persistedState && !isEmpty(persistedState)) {
         setCityState((cityState) => ({ ...cityState, ...persistedState }));
       } else {
-        console.log(state);
         setCityState(state);
       }
     };
@@ -59,7 +63,8 @@ const DetailPage = () => {
       fetchState();
     }
     writeNoteLs(notes_);
-  }, [cityState?.city, city, notes_]);
+    if (showNote) noteRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [cityState?.city, city, notes_, showNote]);
   const notes = notes_.noteList.find(
     (i) => i.city.toLowerCase() === city?.toLowerCase()
   )?.notes;
@@ -78,58 +83,73 @@ const DetailPage = () => {
     }
 
     dispatch(updateNote({ city: city!, notes: newNote }));
+    setnote({ body: "", title: "" });
   };
 
+  const handleShowNote = (e) => {
+    e.preventDefault();
+    setShowNote(true);
+  };
   return (
     <>
-      <Section className="items-center relative -top-28">
-        <Card details={true} city={city!} cityWeather={cityState} />
-        <div className=" w-80 my-4">
-          <div>
-            <label
-              className="block text-gray-500 font-bold md:text-left mb-1 md:mb-0 "
-              htmlFor="title"
-            >
-              Title
-            </label>
-            <input
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-zinc-500"
-              onChange={handleChange}
-              name={"title"}
-              value={note.title}
-            ></input>
-          </div>
-          <div className="my-4">
-            <label
-              className="block text-gray-500 font-bold md:text-left mb-1 md:mb-0 "
-              htmlFor="body"
-            >
-              Body
-            </label>
-            <textarea
-              className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-zinc-500"
-              onChange={handleChange}
-              name={"body"}
-              value={note.body}
-            />
-          </div>
-          <div className="flex justify-end">
-            <Button
-              variant="primary"
-              size="normal"
-              onClick={handleSave}
-              disabled={!note.body || !note.title}
-            >
-              Save
-            </Button>
-          </div>
+      <Section className="items-center ">
+        <div className="relative -mb-40 -top-28 h-fit">
+          <Card
+            details={true}
+            city={city!}
+            cityWeather={cityState}
+            handleShowNote={handleShowNote}
+            noteRef={noteRef}
+          />
+          {showNote && (
+            <div className="my-4 w-80" ref={noteRef}>
+              <div>
+                <label
+                  className="block mb-1 font-bold text-gray-500 md:text-left md:mb-0 "
+                  htmlFor="title"
+                >
+                  Title
+                </label>
+                <input
+                  className="w-full px-4 py-2 leading-tight text-gray-700 bg-gray-200 border-2 border-gray-200 rounded appearance-none focus:outline-none focus:bg-white focus:border-zinc-500"
+                  onChange={handleChange}
+                  name={"title"}
+                  value={note.title}
+                ></input>
+              </div>
+              <div className="my-4">
+                <label
+                  className="block mb-1 font-bold text-gray-500 md:text-left md:mb-0 "
+                  htmlFor="body"
+                >
+                  Body
+                </label>
+                <textarea
+                  className="w-full px-4 py-2 leading-tight text-gray-700 bg-gray-200 border-2 border-gray-200 rounded appearance-none focus:outline-none focus:bg-white focus:border-zinc-500"
+                  onChange={handleChange}
+                  name={"body"}
+                  value={note.body}
+                />
+              </div>
+              <div className="flex justify-end">
+                <Button
+                  variant="primary"
+                  size="normal"
+                  onClick={handleSave}
+                  disabled={!note.body || !note.title}
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </Section>
-      <Section>
-        <h3 className=" text-2xl font-bold mb-2 text-left">Saved Notes</h3>
-        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <Section className="">
+        <h3 className="mb-2 text-2xl font-bold text-left ">Saved Notes</h3>
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {notes?.map(({ date, note }) => (
-            <Note date={date} note={note} edit={() => { }} city={city} />
+            <Note date={date} note={note} edit={() => {}} city={city} />
           ))}
         </div>
       </Section>
