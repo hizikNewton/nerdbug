@@ -76,7 +76,7 @@ const DefaultList = () => {
           </div>
         </Section>
       )}
-      <Section className="items-start">
+      <Section>
         <div className="flex flex-wrap gap-6 justify-evenly">
           {citiesAndWeather.items?.map((item) => (
             <Link
