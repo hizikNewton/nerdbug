@@ -49,7 +49,7 @@ const DefaultList = () => {
         console.error("Error fetching cities by population:", error);
       }
     };
-    if (!read()) {
+    if (!read()?.items) {
       fetchData();
     } else {
       console.log(read(), "read");
@@ -64,17 +64,19 @@ const DefaultList = () => {
         <Section className="items-start">
           <h3 className="mb-2 text-2xl font-bold text-left ">Favourites</h3>
           <div className="flex flex-wrap gap-6 justify-evenly">
-            {favouriteList.sort((a, b) =>
-              a.city.toLowerCase().localeCompare(b.city.toLowerCase())
-            ).map((item) => (
-              <Link
-                to={`/detail/${item.city.toLowerCase()}`}
-                key={item.city}
-                state={{ city: item.city }}
-              >
-                <Card city={item.city} details={false} cityWeather={item} />
-              </Link>
-            ))}
+            {favouriteList
+              .sort((a, b) =>
+                a.city.toLowerCase().localeCompare(b.city.toLowerCase())
+              )
+              .map((item) => (
+                <Link
+                  to={`/detail/${item.city.toLowerCase()}`}
+                  key={item.city}
+                  state={{ city: item.city }}
+                >
+                  <Card city={item.city} details={false} cityWeather={item} />
+                </Link>
+              ))}
           </div>
         </Section>
       )}
