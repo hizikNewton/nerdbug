@@ -44,7 +44,7 @@ export const generateRandomId = (): string => {
   return randomId;
 };
 
-interface CustomPosition {
+export type CustomPosition = {
   coords: {
     latitude: number;
     longitude: number;

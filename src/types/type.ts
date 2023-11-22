@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+export type populationCountType ={
+  year: string;
+  value: string;
+  sex: string;
+  reliabilty: string;
+}
+
 interface dataType {
   city: string;
   country: string;
-  populationCounts: [
-    {
-      year: string;
-      value: string;
-      sex: string;
-      reliabilty: string;
-    }
-  ];
+  populationCounts: Array<populationCountType>;
   weatherInfo: any;
   favourite?: boolean;
 }
